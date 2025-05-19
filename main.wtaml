@@ -1,5 +1,5 @@
   <init>
-    <var name="pageTitle" value="WTAML Page" />
+    <var name="pageTitle">Webtop App</var>
     <title>
       <_pageTitle />
     </title>

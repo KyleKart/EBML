@@ -21,7 +21,7 @@
       if (rootNode) {
         rootNode.querySelectorAll("var").forEach(el => {
           const name = el.getAttribute("name");
-          const value = el.getAttribute("value");
+          const value = el.textContent || "";
           if (name) variables[name] = value;
         });
       }
