@@ -67,7 +67,7 @@
 </html>`;
     }
 
-    fetch("yourfile.ebml")
+    fetch("./ebml.ebml")
       .then(response => response.text())
       .then(text => {
         const output = convertEBMLtoHTML(text);
