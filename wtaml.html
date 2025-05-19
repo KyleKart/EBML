@@ -14,18 +14,22 @@
         throw new Error("Invalid WTAML");
       }
 
+      const rootNode = xmlDoc.querySelector("root");
+      const bodyNode = xmlDoc.querySelector("body");
+
       const variables = {};
-      xmlDoc.querySelectorAll("var").forEach(el => {
-        const name = el.getAttribute("name");
-        const value = el.getAttribute("value");
-        if (name) variables[name] = value;
-      });
+      if (rootNode) {
+        rootNode.querySelectorAll("var").forEach(el => {
+          const name = el.getAttribute("name");
+          const value = el.getAttribute("value");
+          if (name) variables[name] = value;
+        });
+      }
 
       function processNode(node) {
         if (node.nodeType === Node.TEXT_NODE) {
           return node.textContent;
         }
-
         if (node.nodeType === Node.ELEMENT_NODE) {
           const tagName = node.tagName;
 
@@ -44,12 +48,10 @@
 
           return html;
         }
-
         return "";
       }
 
-      const titleNode = xmlDoc.querySelector("title");
-      const bodyNode = xmlDoc.querySelector("body");
+      const titleNode = rootNode ? rootNode.querySelector("title") : null;
 
       const titleHTML = titleNode ? processNode(titleNode) : "";
       const bodyHTML = bodyNode ? processNode(bodyNode) : "";
