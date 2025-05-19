@@ -1,13 +1,34 @@
 <wtaml>
   <init>
-    <var name="pageTitle">Webtop App</var>
+    <var name="pageTitle">My Webtop App</var>
     <title>
       <_pageTitle />
     </title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+      h1 {
+        color: #3366cc;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+    <script>
+      function greet() {
+        alert("Welcome to <_pageTitle />!");
+      }
+    </script>
   </init>
 
   <body>
-    <h1>this is a test</h1>
-    This is <_pageTitle />!
+    <h1><_pageTitle /></h1>
+    <p>This app is built using WTAML — the clean and readable markup language for Webtop applications.</p>
+    <button onclick="greet()">Say Hello</button>
   </body>
 </wtaml>
