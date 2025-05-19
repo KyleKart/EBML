@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EBML Viewer</title>
+</head>
+<body>
+  <div id="output">Loading...</div>
+
+  <script>
+    function convertEBMLtoHTML(ebmlString) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(ebmlString, "application/xml");
+
+      if (xmlDoc.querySelector("parsererror")) {
+        throw new Error("Invalid EBML");
+      }
+
+      const variables = {};
+      xmlDoc.querySelectorAll("var").forEach(el => {
+        const name = el.getAttribute("name");
+        const value = el.getAttribute("value");
+        if (name) variables[name] = value;
+      });
+
+      function processNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.textContent;
+        }
+
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const tagName = node.tagName;
+
+          if (tagName.startsWith("_")) {
+            const varName = tagName.slice(1);
+            return variables[varName] ?? "";
+          }
+
+          if (tagName === "var") return "";
+
+          let html = `<${tagName}>`;
+          node.childNodes.forEach(child => {
+            html += processNode(child);
+          });
+          html += `</${tagName}>`;
+
+          return html;
+        }
+
+        return "";
+      }
+
+      const titleNode = xmlDoc.querySelector("title");
+      const bodyNode = xmlDoc.querySelector("body");
+
+      const titleHTML = titleNode ? processNode(titleNode) : "";
+      const bodyHTML = bodyNode ? processNode(bodyNode) : "";
+
+      return `<!DOCTYPE html>
+<html>
+<head>
+  ${titleHTML}
+</head>
+<body>
+  ${bodyHTML}
+</body>
+</html>`;
+    }
+
+    fetch("yourfile.ebml")
+      .then(response => response.text())
+      .then(text => {
+        const output = convertEBMLtoHTML(text);
+        document.getElementById("output").innerHTML = output;
+      })
+      .catch(err => {
+        document.getElementById("output").textContent = "Error loading EBML: " + err.message;
+      });
+  </script>
+</body>
+</html>
