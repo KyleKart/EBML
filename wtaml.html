@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>WTAML Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
   <script>
     function convertWTAMLtoHTML(wtamlString) {
@@ -50,6 +53,11 @@
           if (tagName.startsWith("_")) {
             const varName = tagName.slice(1);
             return variables[varName] ?? "";
+          }
+
+          if (tagName === "md") {
+            const markdownRaw = replaceVarsInString(node.textContent || "");
+            return marked.parse(markdownRaw);
           }
 
           let html = `<${tagName}`;
@@ -112,4 +120,5 @@ ${bodyHTML}
       });
   </script>
 </body>
+
 </html>
