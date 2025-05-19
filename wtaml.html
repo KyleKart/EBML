@@ -22,6 +22,7 @@
       const initNode = rootNode.querySelector("init");
       const bodyNode = rootNode.querySelector("body");
 
+      // Collect variables from <var name="...">value</var>
       const variables = {};
       if (initNode) {
         initNode.querySelectorAll("var").forEach(el => {
@@ -31,39 +32,61 @@
         });
       }
 
+      // Replace variables in strings like attribute values or text nodes
       function replaceVarsInString(str) {
         return str.replace(/<_([a-zA-Z0-9_-]+)\s*\/>/g, (_, varName) => {
           return variables[varName] ?? "";
         });
       }
 
+      // Recursively process nodes into HTML string
       function processNode(node) {
         if (node.nodeType === Node.TEXT_NODE) {
+          // Replace variable tags inside text content
           return replaceVarsInString(node.textContent);
         }
 
         if (node.nodeType === Node.ELEMENT_NODE) {
           const tagName = node.tagName;
 
+          // Skip <var> tags entirely (they are only for variable declarations)
           if (tagName === "var") return "";
 
+          // If the tag is a self-closing variable tag like <_pageTitle />
+          // or named like <_varName>, replace with variable value directly
+          if (tagName.startsWith("_")) {
+            const varName = tagName.slice(1);
+            return variables[varName] ?? "";
+          }
+
+          // Start opening tag with attributes
           let html = `<${tagName}`;
           for (const attr of node.attributes) {
             html += ` ${attr.name}="${replaceVarsInString(attr.value)}"`;
           }
-          html += `>`;
+          html += ">";
 
-          node.childNodes.forEach(child => {
-            html += processNode(child);
-          });
+          // For <script> and <style> tags, keep raw text with variable substitution, no further node recursion
+          if (tagName === "script" || tagName === "style") {
+            html += replaceVarsInString(node.textContent);
+          } else {
+            // Otherwise process children recursively
+            node.childNodes.forEach(child => {
+              html += processNode(child);
+            });
+          }
 
+          // Close tag
           html += `</${tagName}>`;
+
           return html;
         }
 
+        // For other node types (comments etc), return empty string
         return "";
       }
 
+      // Process <init> into <head>, skipping <var>
       let headHTML = "";
       if (initNode) {
         initNode.childNodes.forEach(child => {
@@ -72,15 +95,17 @@
         });
       }
 
+      // Process <body>
       const bodyHTML = bodyNode ? processNode(bodyNode) : "";
 
+      // Build final HTML document string
       return `<!DOCTYPE html>
 <html>
 <head>
-  ${headHTML}
+${headHTML}
 </head>
 <body>
-  ${bodyHTML}
+${bodyHTML}
 </body>
 </html>`;
     }
