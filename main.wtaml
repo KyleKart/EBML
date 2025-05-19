@@ -19,16 +19,10 @@
         cursor: pointer;
       }
     </style>
-    <script>
-      function greet() {
-        alert("Welcome to <_pageTitle />!");
-      }
-    </script>
   </init>
 
   <body>
     <h1><_pageTitle /></h1>
     <p><_pageTitle /> is built using WTAML — the clean and readable markup language for Webtop applications.</p>
-    <button onclick="greet()">Say Hello</button>
   </body>
 </wtaml>
