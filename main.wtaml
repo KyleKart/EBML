@@ -1,9 +1,9 @@
-  <root>
+  <init>
     <var name="pageTitle" value="WTAML Page" />
     <title>
       <_pageTitle />
     </title>
-  </root>
+  </init>
 
   <body>
     <h1>this is a test</h1>
