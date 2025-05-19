@@ -14,8 +14,13 @@
         throw new Error("Invalid WTAML");
       }
 
-      const initNode = xmlDoc.querySelector("init");
-      const bodyNode = xmlDoc.querySelector("body");
+      const rootNode = xmlDoc.querySelector("wtaml");
+      if (!rootNode) {
+        throw new Error("WTAML root element <wtaml> missing");
+      }
+
+      const initNode = rootNode.querySelector("init");
+      const bodyNode = rootNode.querySelector("body");
 
       const variables = {};
       if (initNode) {
@@ -34,16 +39,13 @@
         if (node.nodeType === Node.ELEMENT_NODE) {
           const tagName = node.tagName;
 
-          // If the tag name starts with '_', it's a variable reference
           if (tagName.startsWith("_")) {
             const varName = tagName.slice(1);
             return variables[varName] ?? "";
           }
 
-          // Skip <var> tags in output
           if (tagName === "var") return "";
 
-          // Process children recursively
           let html = `<${tagName}>`;
           node.childNodes.forEach(child => {
             html += processNode(child);
@@ -56,18 +58,17 @@
         return "";
       }
 
-      // Get title content inside <init> and wrap in <title> tag properly
       let titleHTML = "";
       if (initNode) {
         const titleNode = initNode.querySelector("title");
         if (titleNode) {
-          // Instead of outputting raw inner, wrap with <title>
-          const titleContent = Array.from(titleNode.childNodes).map(processNode).join("");
+          const titleContent = Array.from(titleNode.childNodes)
+            .map(processNode)
+            .join("");
           titleHTML = `<title>${titleContent}</title>`;
         }
       }
 
-      // Process body node content (assumed one top-level <body> node)
       const bodyHTML = bodyNode ? processNode(bodyNode) : "";
 
       return `<!DOCTYPE html>
