@@ -1,0 +1,11 @@
+<ebml>
+  <root>
+    <var name="pageTitle" value="EBML Page" />
+    <title>
+      <_pageTitle />
+    </title>
+  </root>
+
+  <body>
+  </body>
+</ebml>
