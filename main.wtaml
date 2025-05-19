@@ -20,6 +20,5 @@
     <h1><_pageTitle /></h1>
     <p><_pageTitle /> is built using WTAML — the clean and readable markup language for Webtop applications.</p>
     WTAML now supports <md>**Markdown**</md> inside of dedicated MD tags!
-    <mb>*This* **line** is all inside of an `MD` tag.</md>
   </body>
 </wtaml>
