@@ -14,12 +14,12 @@
         throw new Error("Invalid WTAML");
       }
 
-      const rootNode = xmlDoc.querySelector("init");
+      const initNode = xmlDoc.querySelector("init");
       const bodyNode = xmlDoc.querySelector("body");
 
       const variables = {};
-      if (rootNode) {
-        rootNode.querySelectorAll("var").forEach(el => {
+      if (initNode) {
+        initNode.querySelectorAll("var").forEach(el => {
           const name = el.getAttribute("name");
           const value = el.textContent || "";
           if (name) variables[name] = value;
@@ -30,16 +30,20 @@
         if (node.nodeType === Node.TEXT_NODE) {
           return node.textContent;
         }
+
         if (node.nodeType === Node.ELEMENT_NODE) {
           const tagName = node.tagName;
 
+          // If the tag name starts with '_', it's a variable reference
           if (tagName.startsWith("_")) {
             const varName = tagName.slice(1);
             return variables[varName] ?? "";
           }
 
+          // Skip <var> tags in output
           if (tagName === "var") return "";
 
+          // Process children recursively
           let html = `<${tagName}>`;
           node.childNodes.forEach(child => {
             html += processNode(child);
@@ -48,12 +52,22 @@
 
           return html;
         }
+
         return "";
       }
 
-      const titleNode = rootNode ? rootNode.querySelector("title") : null;
+      // Get title content inside <init> and wrap in <title> tag properly
+      let titleHTML = "";
+      if (initNode) {
+        const titleNode = initNode.querySelector("title");
+        if (titleNode) {
+          // Instead of outputting raw inner, wrap with <title>
+          const titleContent = Array.from(titleNode.childNodes).map(processNode).join("");
+          titleHTML = `<title>${titleContent}</title>`;
+        }
+      }
 
-      const titleHTML = titleNode ? processNode(titleNode) : "";
+      // Process body node content (assumed one top-level <body> node)
       const bodyHTML = bodyNode ? processNode(bodyNode) : "";
 
       return `<!DOCTYPE html>
@@ -70,10 +84,14 @@
     fetch("./main.wtaml")
       .then(response => response.text())
       .then(text => {
-        const html = convertWTAMLtoHTML(text);
-        document.open();
-        document.write(html);
-        document.close();
+        try {
+          const html = convertWTAMLtoHTML(text);
+          document.open();
+          document.write(html);
+          document.close();
+        } catch (e) {
+          document.body.innerText = "Error loading WTAML: " + e.message;
+        }
       })
       .catch(err => {
         document.body.innerText = "Error loading WTAML: " + err.message;
