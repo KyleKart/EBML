@@ -1,0 +1,12 @@
+<wtaml>
+  <root>
+    <var name="pageTitle" value="WTAML Page" />
+    <title>
+      <_pageTitle />
+    </title>
+  </root>
+
+  <body>
+    <h1>this is a test</h1>
+  </body>
+</wtaml>

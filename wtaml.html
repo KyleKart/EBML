@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>EBML Viewer</title>
+  <title>WTAML Viewer</title>
 </head>
 <body>
   <script>
-    function convertEBMLtoHTML(ebmlString) {
+    function convertWTAMLtoHTML(wtamlString) {
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(ebmlString, "application/xml");
+      const xmlDoc = parser.parseFromString(wtamlString, "application/xml");
 
       if (xmlDoc.querySelector("parsererror")) {
-        throw new Error("Invalid EBML");
+        throw new Error("Invalid WTAML");
       }
 
       const variables = {};
@@ -65,16 +65,16 @@
 </html>`;
     }
 
-    fetch("./main.ebml")
+    fetch("./main.wtaml")
       .then(response => response.text())
       .then(text => {
-        const html = convertEBMLtoHTML(text);
+        const html = convertWTAMLtoHTML(text);
         document.open();
         document.write(html);
         document.close();
       })
       .catch(err => {
-        document.body.innerText = "Error loading EBML: " + err.message;
+        document.body.innerText = "Error loading WTAML: " + err.message;
       });
   </script>
 </body>
