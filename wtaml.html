@@ -57,7 +57,7 @@
 
           if (tagName === "md") {
             const markdownRaw = replaceVarsInString(node.textContent || "");
-            return marked.parse(markdownRaw);
+            return marked.parseInline(markdownRaw);
           }
 
           let html = `<${tagName}`;
