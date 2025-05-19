@@ -31,42 +31,45 @@
         });
       }
 
+      function replaceVarsInString(str) {
+        return str.replace(/<_([a-zA-Z0-9_-]+)\s*\/>/g, (_, varName) => {
+          return variables[varName] ?? "";
+        });
+      }
+
       function processNode(node) {
         if (node.nodeType === Node.TEXT_NODE) {
-          return node.textContent;
+          return replaceVarsInString(node.textContent);
         }
 
         if (node.nodeType === Node.ELEMENT_NODE) {
           const tagName = node.tagName;
 
-          if (tagName.startsWith("_")) {
-            const varName = tagName.slice(1);
-            return variables[varName] ?? "";
-          }
-
           if (tagName === "var") return "";
 
-          let html = `<${tagName}>`;
+          let html = `<${tagName}`;
+          for (const attr of node.attributes) {
+            html += ` ${attr.name}="${replaceVarsInString(attr.value)}"`;
+          }
+          html += `>`;
+
           node.childNodes.forEach(child => {
             html += processNode(child);
           });
-          html += `</${tagName}>`;
 
+          html += `</${tagName}>`;
           return html;
         }
 
         return "";
       }
 
-      let titleHTML = "";
+      let headHTML = "";
       if (initNode) {
-        const titleNode = initNode.querySelector("title");
-        if (titleNode) {
-          const titleContent = Array.from(titleNode.childNodes)
-            .map(processNode)
-            .join("");
-          titleHTML = `<title>${titleContent}</title>`;
-        }
+        initNode.childNodes.forEach(child => {
+          if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "var") return;
+          headHTML += processNode(child);
+        });
       }
 
       const bodyHTML = bodyNode ? processNode(bodyNode) : "";
@@ -74,7 +77,7 @@
       return `<!DOCTYPE html>
 <html>
 <head>
-  ${titleHTML}
+  ${headHTML}
 </head>
 <body>
   ${bodyHTML}
