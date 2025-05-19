@@ -69,7 +69,6 @@
       .then(response => response.text())
       .then(text => {
         const html = convertEBMLtoHTML(text);
-        // Replace entire document:
         document.open();
         document.write(html);
         document.close();
